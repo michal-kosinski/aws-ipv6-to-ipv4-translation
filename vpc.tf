@@ -48,7 +48,8 @@ resource "aws_subnet" "internal_1" {
   private_dns_hostname_type_on_launch            = "resource-name"
 
   tags = {
-    Name = "mikosins-internal-1"
+    Name                                  = "mikosins-internal-1"
+    "kubernetes.io/cluster/mikosins-test" = "shared"
   }
 }
 
@@ -65,7 +66,8 @@ resource "aws_subnet" "internal_2" {
   private_dns_hostname_type_on_launch            = "resource-name"
 
   tags = {
-    Name = "mikosins-internal-2"
+    Name                                  = "mikosins-internal-2"
+    "kubernetes.io/cluster/mikosins-test" = "shared"
   }
 }
 
@@ -86,7 +88,8 @@ resource "aws_subnet" "ipv6_1" {
   private_dns_hostname_type_on_launch            = "resource-name"
 
   tags = {
-    Name = "mikosins-ipv6"
+    Name                                  = "mikosins-ipv6-1"
+    "kubernetes.io/cluster/mikosins-test" = "shared"
   }
 }
 
@@ -102,7 +105,8 @@ resource "aws_subnet" "ipv6_2" {
   private_dns_hostname_type_on_launch            = "resource-name"
 
   tags = {
-    Name = "mikosins-ipv6-2"
+    Name                                  = "mikosins-ipv6-2"
+    "kubernetes.io/cluster/mikosins-test" = "shared"
   }
 }
 

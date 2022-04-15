@@ -3,7 +3,11 @@ variable "instance_type" {
 }
 
 variable "create_jumphost" {
-  default = true
+  default = false
+}
+
+variable "create_rds" {
+  default = false
 }
 
 provider "aws" {
