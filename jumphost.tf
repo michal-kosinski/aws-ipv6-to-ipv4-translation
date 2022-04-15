@@ -12,17 +12,17 @@ resource "aws_instance" "jumphost" {
   subnet_id          = aws_subnet.external.id
   ipv6_address_count = 1
   security_groups    = [aws_security_group.jumphost.id]
-  key_name           = aws_key_pair.mikosins.key_name
+  key_name           = aws_key_pair.test.key_name
   user_data          = file("userdata.sh")
 
   tags = {
-    Name = "mikosins-jumphost"
+    Name = "${var.common_name}-jumphost"
   }
 }
 
 
 resource "aws_security_group" "jumphost" {
-  name   = "mikosins-jumphost"
+  name   = "${var.common_name}-jumphost"
   vpc_id = aws_vpc.test.id
 
   ingress {
@@ -66,7 +66,7 @@ resource "aws_security_group" "jumphost" {
 }
 
 resource "aws_security_group" "ipv6" {
-  name   = "mikosins-ipv6"
+  name   = "${var.common_name}-ipv6"
   vpc_id = aws_vpc.test.id
 
   ingress {

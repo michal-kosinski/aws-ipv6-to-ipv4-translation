@@ -7,7 +7,7 @@ resource "random_password" "rds" {
 
 resource "aws_db_subnet_group" "internal" {
   count      = var.create_rds == true ? 1 : 0
-  name       = "mikosins-test"
+  name       = var.common_name
   subnet_ids = [aws_subnet.internal_1.id, aws_subnet.internal_2.id]
 }
 
@@ -17,7 +17,7 @@ resource "aws_db_instance" "test" {
   engine                 = "postgres"
   engine_version         = "14"
   instance_class         = "db.t3.small"
-  username               = "mikosins"
+  username               = var.common_name
   password               = random_password.rds[0].result
   skip_final_snapshot    = true
   db_subnet_group_name   = aws_db_subnet_group.internal[0].name

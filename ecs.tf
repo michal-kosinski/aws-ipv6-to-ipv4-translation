@@ -1,5 +1,6 @@
 resource "aws_ecs_cluster" "test" {
-  name = "mikosins-test"
+  count = var.create_ecs == true ? 1 : 0
+  name  = var.common_name
   setting {
     name  = "containerInsights"
     value = "disabled"
@@ -7,8 +8,8 @@ resource "aws_ecs_cluster" "test" {
 }
 
 resource "aws_ecs_cluster_capacity_providers" "test" {
-  cluster_name = aws_ecs_cluster.test.name
-
+  count              = var.create_ecs == true ? 1 : 0
+  cluster_name       = aws_ecs_cluster.test[0].name
   capacity_providers = ["FARGATE_SPOT"]
 
   default_capacity_provider_strategy {
@@ -39,15 +40,17 @@ resource "aws_ecs_cluster_capacity_providers" "test" {
 #}
 
 resource "aws_ecs_task_definition" "test" {
-  family                = "mikosins-test"
-  #  requires_compatibilities = ["FARGATE"]
-  cpu                   = 256
-  memory                = 512
-  network_mode          = "awsvpc"
+  count                    = var.create_ecs == true ? 1 : 0
+  family                   = var.common_name
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = 256
+  memory                   = 512
+  network_mode             = "awsvpc"
+
   # IPv6 registry must be used: https://www.docker.com/blog/beta-ipv6-support-on-docker-hub-registry/
   container_definitions = jsonencode([
     {
-      name         = "mikosins-test"
+      name         = var.common_name
       image        = "registry.ipv6.docker.com/library/nginx:latest"
       cpu          = 256
       memory       = 512

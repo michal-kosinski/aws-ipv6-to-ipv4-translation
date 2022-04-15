@@ -57,7 +57,7 @@ resource "null_resource" "tg" {
 }
 
 resource "aws_security_group" "dualstack_lb" {
-  name   = "mikosins-lb"
+  name   = "${var.common_name}-lb"
   vpc_id = aws_vpc.test.id
 
   ingress {

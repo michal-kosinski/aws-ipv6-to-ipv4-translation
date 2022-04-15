@@ -6,7 +6,7 @@ resource "aws_vpc" "test" {
   assign_generated_ipv6_cidr_block = true
 
   tags = {
-    Name = "mikosins-dualstack"
+    Name = "${var.common_name}-dualstack"
   }
 }
 
@@ -31,7 +31,7 @@ resource "aws_subnet" "external" {
   private_dns_hostname_type_on_launch            = "resource-name"
 
   tags = {
-    Name = "mikosins-external"
+    Name = "${var.common_name}-external"
   }
 }
 
@@ -48,8 +48,8 @@ resource "aws_subnet" "internal_1" {
   private_dns_hostname_type_on_launch            = "resource-name"
 
   tags = {
-    Name                                  = "mikosins-internal-1"
-    "kubernetes.io/cluster/mikosins-test" = "shared"
+    Name                                       = "${var.common_name}-internal-1"
+    "kubernetes.io/cluster/${var.common_name}" = "shared"
   }
 }
 
@@ -66,8 +66,8 @@ resource "aws_subnet" "internal_2" {
   private_dns_hostname_type_on_launch            = "resource-name"
 
   tags = {
-    Name                                  = "mikosins-internal-2"
-    "kubernetes.io/cluster/mikosins-test" = "shared"
+    Name                                       = "${var.common_name}-internal-2"
+    "kubernetes.io/cluster/${var.common_name}" = "shared"
   }
 }
 
@@ -88,8 +88,8 @@ resource "aws_subnet" "ipv6_1" {
   private_dns_hostname_type_on_launch            = "resource-name"
 
   tags = {
-    Name                                  = "mikosins-ipv6-1"
-    "kubernetes.io/cluster/mikosins-test" = "shared"
+    Name                                       = "${var.common_name}-ipv6-1"
+    "kubernetes.io/cluster/${var.common_name}" = "shared"
   }
 }
 
@@ -105,8 +105,8 @@ resource "aws_subnet" "ipv6_2" {
   private_dns_hostname_type_on_launch            = "resource-name"
 
   tags = {
-    Name                                  = "mikosins-ipv6-2"
-    "kubernetes.io/cluster/mikosins-test" = "shared"
+    Name                                       = "${var.common_name}-ipv6-2"
+    "kubernetes.io/cluster/${var.common_name}" = "shared"
   }
 }
 
@@ -119,7 +119,7 @@ resource "aws_route_table" "external" {
   }
 
   tags = {
-    Name = "mikosins-external"
+    Name = "${var.common_name}-external"
   }
 }
 
@@ -132,7 +132,7 @@ resource "aws_route_table" "internal" {
   }
 
   tags = {
-    Name = "mikosins-internal"
+    Name = "${var.common_name}-internal"
   }
 }
 
@@ -150,7 +150,7 @@ resource "aws_route_table" "ipv6" {
   }
 
   tags = {
-    Name = "mikosins-ipv6"
+    Name = "${var.common_name}-ipv6"
   }
 }
 

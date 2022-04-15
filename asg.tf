@@ -1,8 +1,8 @@
 resource "aws_launch_template" "test" {
-  name_prefix            = "mikosins"
+  name_prefix            = var.common_name
   image_id               = data.aws_ami.ecs.id
   instance_type          = var.instance_type
-  key_name               = aws_key_pair.mikosins.key_name
+  key_name               = aws_key_pair.test.key_name
   user_data              = base64encode(file("userdata6.sh"))
   vpc_security_group_ids = [aws_security_group.ipv6.id]
   iam_instance_profile {
@@ -27,7 +27,7 @@ resource "aws_launch_template" "test" {
 }
 
 resource "aws_autoscaling_group" "test" {
-  name_prefix         = "mikosins"
+  name_prefix         = var.common_name
   max_size            = 1
   min_size            = 1
   vpc_zone_identifier = [aws_subnet.ipv6_1.id, aws_subnet.ipv6_2.id]

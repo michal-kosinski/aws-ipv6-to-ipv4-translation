@@ -1,4 +1,5 @@
 resource "aws_eks_cluster" "test" {
+  count    = var.create_eks == true ? 1 : 0
   name     = "mikosins-test"
   role_arn = aws_iam_role.eks.arn
 
@@ -21,46 +22,17 @@ resource "aws_eks_cluster" "test" {
 }
 
 output "endpoint" {
-  value = aws_eks_cluster.test.endpoint
+  value = var.create_eks ? aws_eks_cluster.test[0].endpoint : null
 }
 
 output "kubeconfig-certificate-authority-data" {
-  value = aws_eks_cluster.test.certificate_authority[0].data
-}
-
-resource "aws_iam_role" "eks" {
-  name               = "mikosins-eks-cluster"
-  assume_role_policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Allow",
-          "Principal" : {
-            "Service" : "eks.amazonaws.com"
-          },
-          "Action" : "sts:AssumeRole"
-        }
-      ]
-    }
-  )
-}
-
-resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.eks.name
-}
-
-# Optionally, enable Security Groups for Pods
-# Reference: https://docs.aws.amazon.com/eks/latest/userguide/security-groups-for-pods.html
-resource "aws_iam_role_policy_attachment" "AmazonEKSVPCResourceController" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
-  role       = aws_iam_role.eks.name
+  value = var.create_eks ? aws_eks_cluster.test[0].certificate_authority[0].data : null
 }
 
 resource "aws_eks_fargate_profile" "test" {
-  cluster_name           = aws_eks_cluster.test.name
-  fargate_profile_name   = "mikosins-test"
+  count                  = var.create_eks == true ? 1 : 0
+  cluster_name           = aws_eks_cluster.test[0].name
+  fargate_profile_name   = var.common_name
   pod_execution_role_arn = aws_iam_role.eks_fargate.arn
   subnet_ids             = [aws_subnet.internal_1.id, aws_subnet.internal_2.id]
 
@@ -69,39 +41,18 @@ resource "aws_eks_fargate_profile" "test" {
   }
 }
 
-resource "aws_iam_role" "eks_fargate" {
-  name = "mikosins-eks-fargate-profile"
-
-  assume_role_policy = jsonencode({
-    Statement = [
-      {
-        Action    = "sts:AssumeRole"
-        Effect    = "Allow"
-        Principal = {
-          Service = "eks-fargate-pods.amazonaws.com"
-        }
-      }
-    ]
-    Version = "2012-10-17"
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "AmazonEKSFargatePodExecutionRolePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
-  role       = aws_iam_role.eks_fargate.name
-}
-
 resource "aws_eks_node_group" "test" {
-  cluster_name    = aws_eks_cluster.test.name
-  node_group_name = "mikosins-test"
+  count           = var.create_eks == true ? 1 : 0
+  cluster_name    = aws_eks_cluster.test[0].name
+  node_group_name = var.common_name
   node_role_arn   = aws_iam_role.eks_node_group.arn
   subnet_ids      = [aws_subnet.internal_1.id, aws_subnet.internal_2.id]
 
   remote_access {
-    ec2_ssh_key = aws_key_pair.mikosins.key_name
+    ec2_ssh_key = aws_key_pair.test.key_name
   }
 
-  instance_types = ["t3.medium"]
+  instance_types = [var.instance_type]
 
   scaling_config {
     desired_size = 1
@@ -116,36 +67,4 @@ resource "aws_eks_node_group" "test" {
     aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly,
   ]
-}
-
-resource "aws_iam_role" "eks_node_group" {
-  name = "mikosins-eks-node-group"
-
-  assume_role_policy = jsonencode({
-    Statement = [
-      {
-        Action    = "sts:AssumeRole"
-        Effect    = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      }
-    ]
-    Version = "2012-10-17"
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "AmazonEKSWorkerNodePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = aws_iam_role.eks_node_group.name
-}
-
-resource "aws_iam_role_policy_attachment" "AmazonEKS_CNI_Policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.eks_node_group.name
-}
-
-resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.eks_node_group.name
 }
