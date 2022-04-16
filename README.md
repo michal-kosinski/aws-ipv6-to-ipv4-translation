@@ -1,6 +1,6 @@
 # Minority report: the state of IPv6 on AWS
 ## Is it ready to solve your IPv4 exhaustion or overlaps problems?
-Well, it depends on whether you use managed container orchestration services like ECS or not. Also, it's not that easy to use if your IaC tool of choice is Terraform.
+Well, it depends on whether you use managed container orchestration services like ECS/EKS or not. Also, it's not that easy to use if your IaC tool of choice is Terraform.
 ## The problem
 For some unbelievable reason (we're cloud-native, right?) you might end up without any free IP in your subnets. Or you can't assign any additional CIDRs to the VPC. Or you must stop using overlapping pools and assign new sets of addresses to all existing AWS resources. You're good to go if all your infrastructure is immutable, but still, some VPC-based resources like RDS, Amazon MQ, or ElastiCache are not so easy to move. Why not just use IPv6? It was designed to address exactly such a problem and we had dozen years to develop (cloud)infrastructure and (cloud)services to adopt it[13], right?
 ## Familiar stuff
@@ -17,7 +17,7 @@ Few things:
 * If we already have VPC with IPv6 block assigned we need to create an IPv6-native subnet with DNS64 enabled.
 * In the public IPv4 subnet we need ordinary NAT GW (there is no NAT64 option to enable). If we need to access resources only inside VPC this NAT GW can be set to "Private" connectivity type[7] (without Elastic IP assigned).
 * Route table associated with the IPv6-native subnet should contain **64:ff9b::/96** entry pointing to the NAT GW.
-## Let's test using EC2 instances and RDS
+## Testing with EC2 instances and RDS
 All works as expected. In this example, I've checked if the connection to the ssh port of the IPv4 instance will work. To allow translation on DNS64 we must use the instance DNS name, not the IP address:
 ```
 $ host ip-10-254-1-235.ec2.internal
@@ -63,6 +63,23 @@ I knew about the **dualStackIPv6** account-level ECS setting[10] and enabled it 
 ```
 $ aws ecs put-account-setting --name dualStackIPv6 --value enabled
 ```
+## Let's try EKS!
+IP family set to IPv6. Can't create a cluster in IPv6-native subnets:
+```
+Error: error creating EKS Cluster (mikosins-test): InvalidParameterException: Provided subnets subnet-00eda6293a334280e Free IPs: 0 subnet-0c5d7830239eef2c5 Free IPs: 0 , need at least 5 IPs in each subnet to be free for this operation
+```
+the same for the Fargate Profile:
+```
+Subnet subnet-00eda6293a334280e needs both an IPv4 and IPv6 CIDR to use Fargate with IPv6 cluster
+```
+and the same for the Node Group:
+```
+Error: error creating EKS Node Group (mikosins-test:mikosins-test):
+InvalidParameterException: Not enough available IPs across subnets
+```
+> Amazon EKS does not support dual-stack clusters. However, if your worker nodes contain an IPv4 address, EKS will configure IPv6 pod routing so that pods can communicate with cluster external IPv4 endpoints.
+
+That means that to communicate with IPv4 endpoints the NAT on the instance itself is used and there is no need for DNS64 and NAT64[17].
 ## Final tips
 * To make yum work on IPv6-only instance with AMZN2[11] use **amazon-linux-https disable** command or add it to the user data in LT if you need ASGs.
 * To make IMDS work enable IPv6 protocol in metadata options (currently only aws_launch_template supports this[8]).
@@ -88,6 +105,10 @@ Terraform with supporting Python code used as the playground is available here[1
 13. https://www.google.com/intl/en/ipv6/statistics.html#tab=per-country-ipv6-adoption
 14. https://d1.awsstatic.com/architecture-diagrams/ArchitectureDiagrams/IPv6-reference-architectures-for-AWS-and-hybrid-networks-ra.pdf
 15. https://github.com/michal-kosinski/aws-ipv6-to-ipv4-translation
+16. https://aws.amazon.com/blogs/containers/amazon-eks-launches-ipv6-support/
+17. https://docs.aws.amazon.com/eks/latest/userguide/cni-ipv6.html
+18. https://aws.amazon.com/about-aws/whats-new/2022/01/amazon-eks-ipv6/
+19. https://aws.amazon.com/blogs/aws/amazon-elastic-kubernetes-service-adds-ipv6-networking/
 ## Links
 @medium.com:
 
