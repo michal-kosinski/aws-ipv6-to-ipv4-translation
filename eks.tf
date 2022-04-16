@@ -47,16 +47,15 @@ resource "aws_eks_node_group" "test" {
   node_group_name = var.common_name
   node_role_arn   = aws_iam_role.eks_node_group[0].arn
   subnet_ids      = [aws_subnet.internal_1.id, aws_subnet.internal_2.id]
+  instance_types  = [var.instance_type]
 
   remote_access {
     ec2_ssh_key = aws_key_pair.test.key_name
   }
 
-  instance_types = [var.instance_type]
-
   scaling_config {
     desired_size = 1
-    max_size     = 1
+    max_size     = 2
     min_size     = 1
   }
 
