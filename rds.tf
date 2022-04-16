@@ -16,7 +16,7 @@ resource "aws_db_instance" "test" {
   allocated_storage      = 20
   engine                 = "postgres"
   engine_version         = "14"
-  instance_class         = "db.t3.small"
+  instance_class         = "db.${var.instance_type}"
   username               = var.common_name
   password               = random_password.rds[0].result
   skip_final_snapshot    = true
