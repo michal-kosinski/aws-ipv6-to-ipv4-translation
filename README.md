@@ -50,7 +50,7 @@ Escape character is '^]'.
 ```
 RDS instance IP 10.254.1.222 was translated to afe:1de where de (hex) = 222 (dec). It's impossible to create a DB subnet group consisting only of IPv6-native subnets.
 ## OK, but what about containers?
-In short: it can't be done. I've tried ECS with both EC2 and Fargate launch types. Despite that, the ECS agent can connect to the cluster the ECS service with IPv6-native subnet specified in the **awsvpcConfiguration** won't be created. The same goes for the Fargate:
+In short: it can't be done. I've tried ECS with both EC2 and Fargate launch types. The ECS agent can connect to the cluster successfully. However, the ECS service with IPv6-native subnet specified in the **awsvpcConfiguration** block won't be created. The same goes for the Fargate:
 ```
 $ aws ecs create-service - cluster mikosins-test - service-name mikosins-cli - task-definition mikosins-test:7 - desired-count 1 - launch-type FARGATE - network-configuration "awsvpcConfiguration={subnets=[subnet-0e97f73c45963fffd],securityGroups=[sg-0a163307d2b3c6576]}"
 
@@ -78,7 +78,7 @@ InvalidParameterException: Not enough available IPs across subnets
 
 That means that to communicate with IPv4 endpoints, the NAT on the instance itself is used, and there is no need for DNS64 and NAT64[17].
 ## Final tips
-* To make yum work on IPv6-only instance with AMZN2[11] use **amazon-linux-https disable** command or add it to the user data in LT if you need ASGs.
+* To make yum work on IPv6-only instance with AMZN2[11] use **amazon-linux-https disable** command. Add it inside the user data in LT if you need ASGs.
 * To make IMDS work enable IPv6 protocol in metadata options (currently only aws_launch_template supports this[8]).
 * Creating a TG with an **IpAddressType** parameter set to IPv6 is not possible using Terraform[9] and AWS CLI. It is only possible using the AWS console or the API (I've used boto3).
 * VPC endpoints do not support IPv6-native subnets. But if you put them in the dual-stack subnets with the "Enable DNS name" option checked then it works using the translation mechanism.
