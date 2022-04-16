@@ -1,7 +1,7 @@
 resource "aws_eks_cluster" "test" {
   count    = var.create_eks == true ? 1 : 0
   name     = "mikosins-test"
-  role_arn = aws_iam_role.eks.arn
+  role_arn = aws_iam_role.eks[0].arn
 
   vpc_config {
     subnet_ids              = [aws_subnet.internal_1.id, aws_subnet.internal_2.id]
@@ -33,7 +33,7 @@ resource "aws_eks_fargate_profile" "test" {
   count                  = var.create_eks == true ? 1 : 0
   cluster_name           = aws_eks_cluster.test[0].name
   fargate_profile_name   = var.common_name
-  pod_execution_role_arn = aws_iam_role.eks_fargate.arn
+  pod_execution_role_arn = aws_iam_role.eks_fargate[0].arn
   subnet_ids             = [aws_subnet.internal_1.id, aws_subnet.internal_2.id]
 
   selector {
@@ -45,7 +45,7 @@ resource "aws_eks_node_group" "test" {
   count           = var.create_eks == true ? 1 : 0
   cluster_name    = aws_eks_cluster.test[0].name
   node_group_name = var.common_name
-  node_role_arn   = aws_iam_role.eks_node_group.arn
+  node_role_arn   = aws_iam_role.eks_node_group[0].arn
   subnet_ids      = [aws_subnet.internal_1.id, aws_subnet.internal_2.id]
 
   remote_access {

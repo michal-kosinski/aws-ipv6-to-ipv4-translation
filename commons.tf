@@ -23,7 +23,7 @@ variable "create_rds" {
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region = "eu-west-1"
   default_tags {
     tags = {
       IaC  = "true"
@@ -34,6 +34,9 @@ provider "aws" {
 
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
+data "aws_availability_zones" "available" {
+  state = "available"
+}
 
 resource "aws_key_pair" "test" {
   key_name   = var.common_name

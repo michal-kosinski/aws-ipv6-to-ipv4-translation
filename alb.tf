@@ -25,7 +25,7 @@ resource "aws_lb" "dualstack" {
     environment = {
       ALB_NAME   = self.name
       # Destroy-time provisioners and their connection configurations may only reference attributes of the relate resourceDestroy-time provisioners and their connection configurations may only reference attributes of the relate resource, via 'self', 'count.index', or 'each.key'.
-      AWS_REGION = "us-east-1"
+      AWS_REGION = "eu-west-1"
     }
   }
 }

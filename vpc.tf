@@ -20,7 +20,7 @@ resource "aws_egress_only_internet_gateway" "test" {
 
 resource "aws_subnet" "external" {
   vpc_id                                         = aws_vpc.test.id
-  availability_zone                              = "us-east-1a"
+  availability_zone                              = data.aws_availability_zones.available.names[0]
   cidr_block                                     = cidrsubnet(aws_vpc.test.cidr_block, 8, 1)
   ipv6_cidr_block                                = cidrsubnet(aws_vpc.test.ipv6_cidr_block, 8, 1)
   enable_dns64                                   = true
@@ -37,7 +37,7 @@ resource "aws_subnet" "external" {
 
 resource "aws_subnet" "internal_1" {
   vpc_id                                         = aws_vpc.test.id
-  availability_zone                              = "us-east-1b"
+  availability_zone                              = data.aws_availability_zones.available.names[0]
   cidr_block                                     = cidrsubnet(aws_vpc.test.cidr_block, 8, 2)
   ipv6_cidr_block                                = cidrsubnet(aws_vpc.test.ipv6_cidr_block, 8, 2)
   enable_dns64                                   = true
@@ -55,7 +55,7 @@ resource "aws_subnet" "internal_1" {
 
 resource "aws_subnet" "internal_2" {
   vpc_id                                         = aws_vpc.test.id
-  availability_zone                              = "us-east-1c"
+  availability_zone                              = data.aws_availability_zones.available.names[1]
   cidr_block                                     = cidrsubnet(aws_vpc.test.cidr_block, 8, 3)
   ipv6_cidr_block                                = cidrsubnet(aws_vpc.test.ipv6_cidr_block, 8, 3)
   enable_dns64                                   = true
@@ -78,7 +78,7 @@ resource "aws_nat_gateway" "test" {
 
 resource "aws_subnet" "ipv6_1" {
   vpc_id                                         = aws_vpc.test.id
-  availability_zone                              = "us-east-1b"
+  availability_zone                              = data.aws_availability_zones.available.names[0]
   ipv6_cidr_block                                = cidrsubnet(aws_vpc.test.ipv6_cidr_block, 8, 4)
   enable_dns64                                   = true
   enable_resource_name_dns_aaaa_record_on_launch = true
@@ -95,7 +95,7 @@ resource "aws_subnet" "ipv6_1" {
 
 resource "aws_subnet" "ipv6_2" {
   vpc_id                                         = aws_vpc.test.id
-  availability_zone                              = "us-east-1a"
+  availability_zone                              = data.aws_availability_zones.available.names[1]
   ipv6_cidr_block                                = cidrsubnet(aws_vpc.test.ipv6_cidr_block, 8, 5)
   enable_dns64                                   = true
   enable_resource_name_dns_aaaa_record_on_launch = true
