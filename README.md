@@ -6,7 +6,7 @@ For some unbelievable reason (we're cloud-native, right?), you might have no fre
 ## Familiar stuff
 We're all aware that the IPv6 pool can be assigned to AWS VPC and subnets since people were throwing rocks at dinosaurs. Some of us know that ALB and NLB can operate in dual-stack mode. At the end of 2021, IPv6-only subnets and EC2 instances were added[1] to that mix. That gives us a seamless possibility to provide an ingress path from the IPv4 world to the IPv6. It is also clear that IPv6-only resources can talk to other IPv6 resources.
 ## Not-so-familiar stuff
-What if a resource needs to communicate with an IPv4-only resource like RDS or some integration endpoint? That is where "IPv6 Addressing of IPv4/IPv6 Translators" comes in handy. RFC 6052 [4] defines how it works, and is pretty old (2010). I didn't know such a mechanism existed till I read the "Let Your IPv6-only Workloads Connect to IPv4 Services" [3] article on the AWS news blog by Sébastien Stormacq (thanks!). In AWS, it was implemented as **NAT64** and **DNS64**, where 64 stands for six to four, not 64-bits :-) First, it was available only in the US regions[5] and made available in all regions[6]. The connection process is as follows:
+What if a resource needs to communicate with an IPv4-only resource like RDS or some integration endpoint? That is where "IPv6 Addressing of IPv4/IPv6 Translators" comes in handy. RFC 6052 [4] defines how it works, and is pretty old (2010). I didn't know such a mechanism existed till I read the "Let Your IPv6-only Workloads Connect to IPv4 Services" [3] article on the AWS news blog by Sébastien Stormacq (thanks!). Of course, it is also available for Linux[21]. In AWS, it was implemented as **NAT64** (NAT GW feature) and **DNS64** (Amazon-provided DNS server feature), where 64 stands for six to four, not 64-bits :-) First, it was available only in the US regions[5] and made available in all regions[6]. The connection process is as follows:
 * DNS query is sent to DNS64.
 * If no AAAA record is available then the IPv4 address from the A record is being encoded and the well-known IPv6 prefix **64:ff9b::/96** is added.
 * The connection is routed to the NAT64 gateway because of the route table entry containing a well-known IPv6 prefix. It works similarly to the IPv4 NAT, but instead of using ports for connection mapping between two networks, it uses hexadecimal/decimal conversion and prepends prefix.
@@ -106,7 +106,9 @@ Terraform with supporting Python code used as the playground is available here[1
 17. https://docs.aws.amazon.com/eks/latest/userguide/cni-ipv6.html
 18. https://aws.amazon.com/about-aws/whats-new/2022/01/amazon-eks-ipv6/
 19. https://aws.amazon.com/blogs/aws/amazon-elastic-kubernetes-service-adds-ipv6-networking/
+20. https://github.com/openthread/tayga
+21. https://en.wikipedia.org/wiki/NAT64
 ## Links
 @medium.com:
 
-@linkedin: 
+@linkedin:
