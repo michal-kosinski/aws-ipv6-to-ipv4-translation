@@ -6,6 +6,10 @@ variable "instance_type" {
   default = "t3.small"
 }
 
+variable "region" {
+  default = "eu-west-1"
+}
+
 variable "create_jumphost" {
   default = false
 }
@@ -23,7 +27,7 @@ variable "create_rds" {
 }
 
 provider "aws" {
-  region = "eu-west-1"
+  region = var.region
   default_tags {
     tags = {
       IaC  = "true"
