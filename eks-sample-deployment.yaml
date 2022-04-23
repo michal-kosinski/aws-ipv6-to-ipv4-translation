@@ -32,5 +32,6 @@ spec:
             - name: http
               containerPort: 80
           imagePullPolicy: IfNotPresent
+      schedulerName: fargate-scheduler
       nodeSelector:
         kubernetes.io/os: linux

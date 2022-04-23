@@ -71,9 +71,15 @@ resource "aws_subnet" "internal_2" {
   }
 }
 
+resource "aws_eip" "natgw" {
+  vpc        = true
+  depends_on = [aws_internet_gateway.test]
+}
+
 resource "aws_nat_gateway" "test" {
-  connectivity_type = "private"
+  connectivity_type = "public"
   subnet_id         = aws_subnet.external.id
+  allocation_id     = aws_eip.natgw.allocation_id
 }
 
 resource "aws_subnet" "ipv6_1" {
@@ -125,6 +131,11 @@ resource "aws_route_table" "external" {
 
 resource "aws_route_table" "internal" {
   vpc_id = aws_vpc.test.id
+
+  route {
+    ipv6_cidr_block = "::/0"
+    gateway_id      = aws_egress_only_internet_gateway.test.id
+  }
 
   route {
     cidr_block = "0.0.0.0/0"

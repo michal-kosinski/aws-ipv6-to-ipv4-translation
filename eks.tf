@@ -29,6 +29,18 @@ output "kubeconfig-certificate-authority-data" {
   value = var.create_eks ? aws_eks_cluster.test[0].certificate_authority[0].data : null
 }
 
+resource "aws_eks_fargate_profile" "kube_system" {
+  count                  = var.create_eks == true ? 1 : 0
+  cluster_name           = aws_eks_cluster.test[0].name
+  fargate_profile_name   = "kube-system"
+  pod_execution_role_arn = aws_iam_role.eks_fargate[0].arn
+  subnet_ids             = [aws_subnet.internal_1.id, aws_subnet.internal_2.id]
+
+  selector {
+    namespace = "kube-system"
+  }
+}
+
 resource "aws_eks_fargate_profile" "test" {
   count                  = var.create_eks == true ? 1 : 0
   cluster_name           = aws_eks_cluster.test[0].name
@@ -42,7 +54,7 @@ resource "aws_eks_fargate_profile" "test" {
 }
 
 resource "aws_eks_node_group" "test" {
-  count           = var.create_eks == true ? 1 : 0
+  count           = var.create_eks == true ? 0 : 0
   cluster_name    = aws_eks_cluster.test[0].name
   node_group_name = var.common_name
   node_role_arn   = aws_iam_role.eks_node_group[0].arn

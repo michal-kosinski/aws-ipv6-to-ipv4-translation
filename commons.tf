@@ -19,7 +19,7 @@ variable "create_ecs" {
 }
 
 variable "create_eks" {
-  default = false
+  default = true
 }
 
 variable "create_rds" {
