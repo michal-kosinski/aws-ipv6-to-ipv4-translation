@@ -7,7 +7,7 @@ resource "aws_lb" "dualstack" {
   subnets            = [aws_subnet.internal_1.id, aws_subnet.internal_2.id]
 
   provisioner "local-exec" {
-    command = "python3 ${path.cwd}/tg-create.py"
+    command = "python3 ${path.cwd}/tg.py create"
 
     environment = {
       AWS_REGION = data.aws_region.current.name
@@ -20,7 +20,7 @@ resource "aws_lb" "dualstack" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "python3 ${path.cwd}/tg-destroy.py"
+    command = "python3 ${path.cwd}/tg.py destroy"
 
     environment = {
       ALB_NAME   = self.name
@@ -46,7 +46,7 @@ resource "null_resource" "tg" {
   }
 
   provisioner "local-exec" {
-    command = "python3 ${path.cwd}/tg-update.py"
+    command = "python3 ${path.cwd}/tg.py update"
 
     environment = {
       AWS_REGION = data.aws_region.current.name
